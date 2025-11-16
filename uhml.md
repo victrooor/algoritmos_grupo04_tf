@@ -25,5 +25,5 @@ classDiagram
       +run()
     }
 
-...
+``` 
 

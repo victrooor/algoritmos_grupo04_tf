@@ -2,6 +2,7 @@
 
 ## Informe de Trabajo -- Hito 1
 
+
 **Carrera de Ciencias de la Computación -- 2025**
 
 **Sección:** 251\

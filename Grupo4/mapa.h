@@ -1,180 +1,89 @@
-ï»¿#pragma once
-#include <string>
-#include <map>
-#include <vector>
-#include "Recurso.h"
-#include "Personaje.h"
-#include "Aliado.h"
+#pragma once
 #include "Villano.h"
+#include "PersonajePrincipal.h"
+#include "Recurso.h"
+using namespace System;
+using namespace System::Windows::Forms;
+using namespace System::Drawing;
 
-const int ANCHO_MAPA = 80;
-const int ALTO_MAPA = 25;
-
-enum tipoMundo { IA, Humano, Colaborativo };
-enum tipoObjetos { arbol, fabricas, microprocesador };
-
-static std::map<tipoObjetos, std::vector<std::string>> formas = { //la variable es formas y el tipo de dato es std::map<tipoObjetos, std::vector<std::string>>. Esa lina indica que formas es un mapa asociativo (std::map) que realciona claves de tipo tipoObjetos con valores de tipo std::vector <std::string>
-	{ arbol, {
-		"  &&  ",
-		" &&&& ",
-		"&&&&&&",
-		"  ||"
-	}},
-	{ fabricas, {
-		" ~~~ ",
-		"~~~~~",
-		" | |",
-		" | |",
-	}},
-	{ microprocesador, {
-		"|--------------|",
-		"â”‚ 10010101010  â”‚",
-		"â”‚ 10101010101  â”‚",
-		"|--------------|"
-	}}
-};
-
-
-
-class Mapa {
+ref class Mapa {
 private:
-	std::string descripcion;
-	std::vector <Recurso*>recursos;
-	std::vector <Villano*>villanos;
-	tipoObjetos objetotipo;
-	tipoMundo tipo;
-	std::string casa;
-
-	bool ocupado[ANCHO_MAPA][ALTO_MAPA] = { false }; //me indica ocupacion
-
+    int x, y, W, H;
+    Bitmap^ fondo;
+    String^ rutaFondo;
+    Villano^ antagonista;
+    Villano^ cocodrilo;
+    PersonajePrincipal^ protagonista;
+    Recurso^ flores;
+    Keys t;
+    Random^ aleatorio;
+    bool colisionMurcielago,ColisionConFlor, colisionCocodrilo;//Tambien en GameManger y agregar enColisionConDiamante
+    //int contadorDiamantes; Esto tambien iria en GameManager
+    int contadorFlores;//tambien en GameManager
+    int contadorDaño;//variable que debe usar Anjali en GameManager para mostrar numero de colisiones de daño
 public:
-	Mapa(tipoMundo tipomundo) :tipo(tipomundo) {
-		srand(time(NULL));
-		generarMapa();
-	}
-	~Mapa() { //esto se ejecuta automatico si el mapa se destruye (funciona al finalizar todo el juego), pero no a mitad del juego
-		for (auto r : recursos)
-			delete r;//liberas la memoria del objeto Recurso (desaparece del juego/pantalla si lo dibujabas).
-		for (auto v : villanos)
-			delete v;
-	}
-	void generarMapa() {
-		int objetosPorZona = 2;
-		switch (tipo) {
-		case tipoMundo::Humano:
-			for (int i = 0; i <= 10; i++) {
-				// Generar Ã¡rboles, animales, etc.
-				descripcion = "Bosque verde y frondoso";
-				objetotipo = arbol;
-				dibujarObjeto(objetotipo, rand() % 40, rand() % 5);
-			}
-			break;
 
-		case tipoMundo::IA:
-			for (int i = 0; i <= 10; i++) {
-				descripcion = "Ciudad gris y ruidosa";
-				objetotipo = fabricas;
-				dibujarObjeto(objetotipo, rand() % 40, rand() % 5);
-			}
-			break;
+   
+    Mapa(int x, int y, String^ rutaFondo,PersonajePrincipal^ protagonista)
+        : x(x), y(y), rutaFondo(rutaFondo),contadorDaño(0),contadorFlores(0), colisionMurcielago(false), colisionCocodrilo(false), ColisionConFlor(false)
+    {
+        aleatorio = gcnew Random();
+        this->protagonista = protagonista;
+        fondo = gcnew Bitmap(rutaFondo);
+        W = fondo->Width;
+        H = fondo->Height;
+        antagonista = gcnew Villano(50, 20, "imagenes/Enemigo.png", W, H, 5, 4); 
+        cocodrilo = gcnew Villano(60, 60, "imagenes/cocodrilo.png", W, H, 3, 4);
+        flores = gcnew Recurso(aleatorio->Next(1, W-50),aleatorio->Next(1, H-50),"imagenes/flores.png",3,1);
+        //diamantes=gcnew Recurso(int posicionX, int posicionY, String^ r,int columnas, int filas);
+    }
 
-		case tipoMundo::Colaborativo:
-			for (int i = 0; i <= 10; i++) {
-				descripcion = "Desierto inmenso y Ã¡rido";
-				objetotipo = microprocesador;
-				dibujarObjeto(objetotipo, rand() % 40, rand() % 5);
-			}
-			break;
-		}
+    ~Mapa() {}
 
-		// ðŸ”¹ Dividimos la pantalla en 4 cuadrantes
-		int mitadAncho = ANCHO_MAPA / 2;
-		int mitadAlto = ALTO_MAPA / 2;
+   
+    void mostrarMapa(Graphics^ gr, Keys t) {
+        antagonista->moverMurcielago(W, H);
+        cocodrilo->moverCocodrilo(W, H);
+        protagonista->mover(t);
 
-		for (int zona = 0; zona < 4; zona++) {
-			int xInicio = (zona % 2 == 0) ? 0 : mitadAncho;
-			int yInicio = (zona < 2) ? 0 : mitadAlto;
+        gr->DrawImage(fondo, x, y, W, H);
+        antagonista->seleccionSprite(gr);
+        protagonista->seleccionSprite(gr);
+        flores->mostrarFlor(gr);
+        cocodrilo->seleccionSprite(gr);
+    }
+    int Daño() { //esto deberia adaptarse al metodo verificarDerrota de Anjali
+        
+        bool col1 = protagonista->colision(antagonista);
+        bool col2 = protagonista->colision(cocodrilo);
 
-			for (int i = 0; i < objetosPorZona; i++) {
-				int x = xInicio + rand() % mitadAncho;
-				int y = yInicio + rand() % mitadAlto;
-				dibujarObjeto(objetotipo, x, y);
-			}
-		}
-	}
+        if (col1 && !colisionMurcielago)
+            contadorDaño++;
 
-	void dibujarObjeto(tipoObjetos tipo, int x, int y) {
-		auto it = formas.find(tipo);
-		if (it != formas.end()) {
-			switch (tipo) {
-			case tipoObjetos::arbol:
-				Console::ForegroundColor = ConsoleColor::Green;
-				break;
-			case tipoObjetos::fabricas:
-				Console::ForegroundColor = ConsoleColor::DarkGray;
-				break;
-			case tipoObjetos::microprocesador:
-				Console::ForegroundColor = ConsoleColor::Yellow;
-				break;
-			default:
-				Console::ForegroundColor = ConsoleColor::White;
-				break;
-			}
+        colisionMurcielago = col1;
 
-			int dy = 0;
-			for (const auto& linea : it->second) {
-				Console::SetCursorPosition(x, y + dy);
-				std::cout << linea;
+        if (col2 && !colisionCocodrilo)
+            contadorDaño++;
 
-				for (int dx = 0; dx < (int)linea.size(); dx++) {
-					int posX = x + dx;
-					int posY = y + dy;
-					if (posX >= 0 && posX < ANCHO_MAPA && posY >= 0 && posY < ALTO_MAPA) {
-						ocupado[posX][posY] = true;
-					}
-				}
-				dy++;
-			}
-		}
-	}
-	bool posicionLibre(int x, int y) {
-		if (x < 0 || x >= ANCHO_MAPA || y < 0 || y >= ALTO_MAPA)
-			return false;
-		return !ocupado[x][y];
-	}
-	void colocarRecursos() {
-		bool jugando = true;
+        colisionCocodrilo = col2;
 
-		while (jugando) {
-			int n = rand() % 5 + 1;
-			int x, y;
+        return contadorDaño;
+    }
+    int Recolectar() {//esto tambien deberia adaptarse al metodo verificarDerrota 
+        bool estaColisionandoflor = protagonista->colision(flores);
+        if (estaColisionandoflor && !ColisionConFlor) {
+            contadorFlores++;
+        }
+        ColisionConFlor = estaColisionandoflor;
+        return contadorFlores;
+        ////
+        //bool estaColisionandoDiamante = protagonista->colision(diamantes);
+        /*if (estaColisionandoDiamante && !enColisionConDiamante) {
+            contadorDiamante++;
+        }*/
+        /*enColisionConDiamante = estaColisionandoDiamante;
+        return contadorDiamantes;*/
+    }
 
-			// Buscar posiciÃ³n libre
-			do {
-				x = rand() % ANCHO_MAPA;
-				y = rand() % ALTO_MAPA;
-			} while (!posicionLibre(x, y));/*genera coordenas dentro del mapa y vuelve a generar mientras la posion no estÃ©  libre*/
-
-			// Marcar posiciÃ³n como ocupada
-			ocupado[x][y] = true;
-
-			// Crear recurso y dibujarlo
-			recursos.push_back(new Recurso(x, y, rand() % 3 + 1));
-			for (auto r : recursos)
-				r->dibujarRecurso();
-
-			Threading::Thread::Sleep(1000);
-
-			if (recursos.size() > 5) {
-				Recurso* viejo = recursos.front();
-				viejo->desaparecer();
-				delete viejo;
-				recursos.erase(recursos.begin());
-			}
-		}
-	}
-	void establecerPersonaje() {
-
-	}
 };
 

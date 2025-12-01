@@ -15,28 +15,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Aliado.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Jugador.h">
+    <ClCompile Include="MyForm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MyForm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Personaje.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Recurso.h">
+    <ClInclude Include="PersonajePrincipal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Villano.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mapa.h">
+    <ClInclude Include="Mapa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClInclude Include="Recurso.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

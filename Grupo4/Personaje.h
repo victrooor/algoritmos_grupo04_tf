@@ -1,46 +1,47 @@
-#pragma once
-#include <iostream>
-using namespace System;
-
-class Personaje {
-protected:
-    int x, y;
-    std::string sprite;
-
-public:
-    Personaje(int px, int py, std::string spr) {
-        x = px;
-        y = py;
-        sprite = spr; // el dibujo en ASCII
-    }
-
-    void mover(std::string direccion) {
-        if (direccion == "arriba" && y > 0) y--;
-        else if (direccion == "abajo" && y < 19) y++;
-        else if (direccion == "izquierda" && x > 0) x--;
-        else if (direccion == "derecha" && x < Console::WindowWidth - sprite.size()) x++; // para que sea alto de el inventario
-    }
-
-    void moverAleatorio() { // villano y aliado
-        int dir = rand() % 4;
-        if (dir == 0 && y > 0) y--;
-        else if (dir == 1 && y < 19) y++;
-        else if (dir == 2 && x > 0) x--;
-        else if (dir == 3 && x < Console::WindowWidth - sprite.size()) x++; // alto del inventorio
-    }
+﻿	#pragma once
+	#include <string>
+	using namespace System;
+	using namespace System::Drawing;
+	using namespace System::Windows::Forms;
 
 
-    void dibujar() {
-        Console::SetCursorPosition(x, y);
-        std::cout << sprite;
-    }
 
-    void borrar() {
-        Console::SetCursorPosition(x, y);
-        for (int i = 0; i < sprite.size(); i++) std::cout << " ";
-    }
+	ref class Personaje {
+	protected:
+		int x, y;
+		String^ sprite;
+		int columnas,filas;
+		int indiceH;
+		int indiceV;
+		Bitmap^ personaje;
+		int W;     
+		int H;
+	
+	public:
+		Graphics^ gr;
+		Personaje(String^ sprite, int x, int y,int columnas, int filas):sprite(sprite), x(x), y(y), columnas(columnas), filas(filas), indiceH(0), indiceV(0) {
+			personaje = gcnew Bitmap(sprite);
+			W = personaje->Width / columnas;
+			H = personaje->Height / filas;
+		}
+		~Personaje() {
+		}
 
-    int getX() { return x; }
-    int getY() { return y; }
-    std::string getSprite() { return sprite; }
-};
+		virtual void mover(Keys t) {
+			// Se implementa en clases derivadas
+		}	
+
+		void seleccionSprite(Graphics^ gr) { 
+		
+
+			int escala = 64;
+
+			Rectangle destino(x, y, escala, escala);
+			Rectangle origen(indiceH * W, indiceV * H, W, H);
+		
+			gr->DrawImage(personaje, destino, origen, GraphicsUnit::Pixel);
+		}
+	
+		
+
+	};

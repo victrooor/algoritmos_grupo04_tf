@@ -24,13 +24,8 @@ public:
     array<Recurso^>^ flores; //tener mas flores que aparecen
     Random^ aleatorio;
 
-    property int WidthMapa { // ajt getter setter
-        int get() { return W; }
-    }
-
-    property int HeightMapa {
-        int get() { return H; }
-    }
+    int getWidthMapa() { return W; }
+    int getHeightMapa() { return H; }
    
     Mapa(int x, int y, String^ rutaFondo,PersonajePrincipal^ protagonista)
         : x(x), y(y), rutaFondo(rutaFondo)

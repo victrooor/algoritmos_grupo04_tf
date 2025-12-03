@@ -160,12 +160,13 @@ namespace JuegoFinal {
 		bool colCocodrilo = mapaActual->colisionCocodrilo();
 		gm->Dano(colMurcielago, colCocodrilo);
 
-		int indiceFlor = -1;
-		bool colFlor = mapaActual->colisionFlor(indiceFlor);
-		if (colFlor && indiceFlor >= 0) {
-			mapaActual->flores[indiceFlor]->activo = false;
-			gm->Recolectar();
+		int indiceFlor = mapaActual->colisionFlor();
+
+		if (indiceFlor != -1) {
+			mapaActual->flores[indiceFlor]->activo = false;  
+			gm->Recolectar();        
 		}
+
 
 		lbl_DAÑO->Text = "DAÑO: " + gm->contadorDaño.ToString();
 		lblAgua->Text = "FLORES: " + gm->contadorFlores.ToString();

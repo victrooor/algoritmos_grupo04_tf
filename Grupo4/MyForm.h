@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Mapa.h"
 #include "PersonajePrincipal.h"
 #include "Villano.h"
@@ -25,7 +25,11 @@ namespace JuegoFinal {
 			//
 			timer1->Interval = 130; // velocidad de actualización
 			timer1->Enabled = true;
-			protagonista = gcnew PersonajePrincipal(5,5,"imagenes/Jugador1.png",3,4);
+			protagonista = gcnew PersonajePrincipal(5,5,"sprites and backgrounds/Jugador1.png",3,4);
+			
+			// ajout : conectar a GM
+			gm = gcnew GameManager();
+
 			DoubleBuffered = true;
 			this->KeyPreview = true;//permite captar la teclas. Incluso si tengo lo botones, textbox,
 			this->KeyUp += gcnew KeyEventHandler(this, &MyForm::MyForm_KeyUp);
@@ -33,10 +37,15 @@ namespace JuegoFinal {
 			contador = 0;
 
 			// ------------ MAPAS CORREGIDOS ------------
-			fondo1 = gcnew Mapa(0, 0, "imagenes/fondo1.png",protagonista);
-			fondo2 = gcnew Mapa(0, 0, "imagenes/fondo2.png",protagonista);
+			fondo1 = gcnew Mapa(0, 0, "sprites and backgrounds/fondo1.png",protagonista);
+			fondo2 = gcnew Mapa(0, 0, "sprites and backgrounds/fondo2.png",protagonista);
 
 			mapaActual = fondo1;
+
+			this->ClientSize = System::Drawing::Size(
+				mapaActual->WidthMapa,
+				mapaActual->HeightMapa
+			);
 			// ------------------------------------------
 		}
 
@@ -61,6 +70,11 @@ namespace JuegoFinal {
 		/// </summary>
 
 		PersonajePrincipal^ protagonista;
+		array<bool>^ teclas;
+		// ajout connectar a GameManager
+		GameManager^ gm;
+
+
 		Keys teclaActual;
 	private: System::Windows::Forms::Label^ lblAgua;
 
@@ -85,6 +99,8 @@ namespace JuegoFinal {
 			this->lblAgua = (gcnew System::Windows::Forms::Label());
 			this->lbl_DAÑO = (gcnew System::Windows::Forms::Label());
 			this->SuspendLayout();
+			gm = gcnew GameManager(); 
+			teclas = gcnew array<bool>(4);
 			// 
 			// timer1
 			// 
@@ -135,23 +151,42 @@ namespace JuegoFinal {
 	}
 
 	private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) {
-		protagonista->mover(teclaActual);// permite mover
-		lbl_DAÑO->Text = "DAÑO" + (fondo1->Daño()).ToString();
-		lblAgua->Text = "FLORES" + (fondo1->Recolectar()).ToString();
 
-		// pasar de mapa1 → mapa2 bajando
+		protagonista->mover(teclaActual);
+		mapaActual->moverEnemigos();
+		mapaActual->moverJugador(teclas);
+
+		bool colMurcielago = mapaActual->colisionMurcielago();
+		bool colCocodrilo = mapaActual->colisionCocodrilo();
+		gm->Dano(colMurcielago, colCocodrilo);
+
+		int indiceFlor = -1;
+		bool colFlor = mapaActual->colisionFlor(indiceFlor);
+		if (colFlor && indiceFlor >= 0) {
+			mapaActual->flores[indiceFlor]->activo = false;
+			gm->Recolectar();
+		}
+
+		lbl_DAÑO->Text = "DAÑO: " + gm->contadorDaño.ToString();
+		lblAgua->Text = "FLORES: " + gm->contadorFlores.ToString();
+
+		if (gm->verificarDerrota()) {
+			timer1->Enabled = false;
+			MessageBox::Show("Has Perdido");
+			this->Close();
+			return;
+		}
+
 		if (mapaActual == fondo1 && protagonista->getY() > this->ClientSize.Height - 60) {
 			mapaActual = fondo2;
-			protagonista->setY(10); // reaparece arriba
+			protagonista->setY(10);
 		}
-
-		// regresar de mapa2 → mapa1 subiendo
 		if (mapaActual == fondo2 && protagonista->getY() < 10) {
 			mapaActual = fondo1;
-			protagonista->setY(this->ClientSize.Height - 70); // reaparece abajo
+			protagonista->setY(this->ClientSize.Height - 70);
 		}
 
-		this->Invalidate();	
+		this->Invalidate();
 	}
 
 	private: System::Void MyForm_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
@@ -169,5 +204,7 @@ namespace JuegoFinal {
 	}
 	private: System::Void lbl_DAÑO_Click(System::Object^ sender, System::EventArgs^ e) {
 	}
+
+
 };
 }

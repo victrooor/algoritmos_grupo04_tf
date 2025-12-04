@@ -1,131 +1,129 @@
-
-
 # Informe del Trabajo final 
 
 ## Diagrama de clases 
 
 ```mermaid
-class Mapa {
-    -x : int
-    -y : int
-    -W : int
-    -H : int
-    -fondo : Bitmap
-    -rutaFondo : String
-    -murcielago : Villano
-    -cocodrilo : Villano
-    -protagonista : PersonajePrincipal
-    -t : System::Windows::Keys
-    -aletorio:Random
-    +ventanaH:int
-    +ventanaW:int
 
-    +mostrarMapa(Graphics* gr, Keys t) : void
-    +Recolectar() : bool
-    +moverJugador(array<bool>^ teclas) : void
-    +colisionMurcielago() : bool
-    +colisionCocodrilo() : bool
-    +colisionFlor() : bool
-    +getWidthMapa() : int
-    +getHeightMapa() : int
-}
+classDiagram
+    class Mapa {
+        -x : int
+        -y : int
+        -W : int
+        -H : int
+        -fondo : Bitmap
+        -rutaFondo : String
+        -murcielago : Villano
+        -cocodrilo : Villano
+        -protagonista : PersonajePrincipal
+        -t : System::Windows::Keys
+        -aletorio: Random
+        +ventanaH: int
+        +ventanaW: int
 
-class Recursos {
-    -posicionX : int
-    -posicionY : int
-    -r : String
-    -recursos : Bitmap
-    -columnas : int
-    -filas : int
-    -escalaFrame : int
-    -selector : Random
-    -wFrame : int
-    -hFrame : int
-    -activo : bool
+        +mostrarMapa(Graphics* gr, Keys t) : void
+        +Recolectar() : bool
+        +moverJugador(array<bool>^ teclas) : void
+        +colisionMurcielago() : bool
+        +colisionCocodrilo() : bool
+        +colisionFlor() : bool
+        +getWidthMapa() : int
+        +getHeightMapa() : int
+    }
 
-    +mostrarFlor(Graphics* gr) : void
-    +mostrarDiamante(Graphics* gr) : void
-    +getBoundRecurso() : Rectangle
-    +moverA(int nuevaX, int nuevaY) : void
-}
+    class Recursos {
+        -posicionX : int
+        -posicionY : int
+        -r : String
+        -recursos : Bitmap
+        -columnas : int
+        -filas : int
+        -escalaFrame : int
+        -selector : Random
+        -wFrame : int
+        -hFrame : int
+        -activo : bool
 
-class Personaje {
-    -x : int
-    -y : int
-    -indiceH : int
-    -indiceV : int
-    -sprite : string
-    -filas : int
-    -columnas : int
-    -personaje : Bitmap
-    -W : int
-    -H : int
+        +mostrarFlor(Graphics* gr) : void
+        +mostrarDiamante(Graphics* gr) : void
+        +getBoundRecurso() : Rectangle
+        +moverA(int nuevaX, int nuevaY) : void
+    }
 
-    +mover(Keys t) : void ✓ virtual
-    +seleccionSprite(Graphics^ gr) : void
-}
+    class Personaje {
+        -x : int
+        -y : int
+        -indiceH : int
+        -indiceV : int
+        -sprite : string
+        -filas : int
+        -columnas : int
+        -personaje : Bitmap
+        -W : int
+        -H : int
 
-class PersonajePrincipal {
-    +mover(Keys t) : void ✓ override
-    +colision(Villano* otroVillano) : bool
-    +colision(Recurso* otroRecurso) : bool
-}
+        +mover(Keys t) : void {virtual}
+        +seleccionSprite(Graphics^ gr) : void
+    }
 
-class Villano {
-    -limiteAlto : int
-    -limiteAncho : int
-    -anchoForm : int
-    -altoForm : int
-    -randomPos : Random
+    class PersonajePrincipal {
+        +mover(Keys t) : void {override}
+        +colision(Villano* otroVillano) : bool
+        +colision(Recurso* otroRecurso) : bool
+    }
 
-    +getBoundVillano() : Rectangle
-    +moverMurcielago(int anchoEspacio, int altoEspacio) : void ✓ override
-    +moverCocodrilo(int anchoEspacio, int altoEspacio):void ✓ override
-}
+    class Villano {
+        -limiteAlto : int
+        -limiteAncho : int
+        -anchoForm : int
+        -altoForm : int
+        -randomPos : Random
 
-class Aliado {
-    +ayudar() : void
-}
+        +getBoundVillano() : Rectangle
+        +moverMurcielago(int anchoEspacio, int altoEspacio) : void {override}
+        +moverCocodrilo(int anchoEspacio, int altoEspacio) : void {override}
+    }
 
-class Menu {
-    -titulo : string
-    -opcionSeleccionada : int
-    -gm : GameManager
+    class Aliado {
+        +ayudar() : void
+    }
 
-    +mostrarOpciones() : void
-    +seleccionarOpcion(int opc) : void
-    +iniciarJuego() : void
-    +mostrarInstrucciones() : void
-    +salirJuego() : void
-}
+    class Menu {
+        -titulo : string
+        -opcionSeleccionada : int
+        -gm : GameManager
 
-class GameManager {
-    -tiempoRestante : int
-    -vidas : int
-    -objetivoAgua : int = 50
-    -objetivoMadera : int = 50
-    -objetivoRoca : int = 5
+        +mostrarOpciones() : void
+        +seleccionarOpcion(int opc) : void
+        +iniciarJuego() : void
+        +mostrarInstrucciones() : void
+        +salirJuego() : void
+    }
 
-    +iniciarJuego() : void
-    +actualizarTiempo() : void
-    +verificarVictoria(int diamante, int flor) : bool
-    +verificarTiempo() : bool
-    +verificarDerrota() : bool
-    +recolectar() : void
-    +verificarDerrota() : bool
-    +DanoCocodrilo(bool murcielago) : bool
-    +getInfo() : string
-}
+    class GameManager {
+        -tiempoRestante : int
+        -vidas : int
+        -objetivoAgua : int = 50
+        -objetivoMadera : int = 50
+        -objetivoRoca : int = 5
 
-%% Relaciones
+        +iniciarJuego() : void
+        +actualizarTiempo() : void
+        +verificarVictoria(int diamante, int flor) : bool
+        +verificarTiempo() : bool
+        +verificarDerrota() : bool
+        +recolectar() : void
+        +DanoCocodrilo(bool murcielago) : bool
+        +getInfo() : string
+    }
 
-Mapa "1*" *--  Recursos
-PersonajePrincipal "1*" o--  Recursos
-
-Mapa "1*" *-- Personaje
-Personaje <|-- PersonajePrincipal
-Personaje <|-- Villano
-Personaje <|-- Aliado
-
-Menu  *-- GameManager
-GameManager  *-- "3" Mapa
+    %% Relaciones
+    Mapa "1" *-- "*" Recursos
+    PersonajePrincipal "1" o-- "*" Recursos
+    Mapa "1" *-- "*" Personaje
+    Personaje <|-- PersonajePrincipal
+    Personaje <|-- Villano
+    Personaje <|-- Aliado
+    Menu "1" *-- "1" GameManager
+    GameManager "1" *-- "3" Mapa
+    
+    note for PersonajePrincipal "El diamante representa aprender, las flores representan humanidad y las fuentes de luz la estabilidad (IA y humano)"

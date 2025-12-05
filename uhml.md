@@ -115,16 +115,6 @@ classDiagram
         bool DanoCocodrilo(bool murcielago)
         string getInfo()
     }
-    class Diamante{
-        int x
-        int y
-        Bitmap img
-        int W
-        int H
-
-        void mostrar(Graphics gr)
-        Rectangle getRect()
-    }
 
     %% Relaciones
     Mapa "1" *-- "*" Recursos
@@ -135,6 +125,6 @@ classDiagram
     Personaje <|-- Aliado
     Menu "1" *-- "1" GameManager
     GameManager "1" *-- "3" Mapa
-    Mapa "1*" *-- "1*" Diamante
+   
     
     note for PersonajePrincipal "El diamante representa aprender, las flores representan humanidad y las fuentes de luz la estabilidad (IA y humano)"
